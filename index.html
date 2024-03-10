@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Fetching Dog Data</title>
+</head>
+<body>
+  <h1>Dog Breeds</h1>
+  <ul id="breeds-list"></ul>
+  <div id="breed-details"></div>
+  <h2>Random Dog Facts</h2>
+  <ul id="dog-facts"></ul>
+  <h2>Dog Groups</h2>
+  <ul id="dog-groups"></ul>
+
+  <script>
+    // Part 1: Basic Fetch Request
+    fetch('https://dog.ceo/api/breeds/list/all')
+      .then(response => {
+        if (!response.ok) {
+          throw new Error('Network response was not ok');
+        }
+        return response.json();
+      })
+      .then(data => {
+        console.log(data);
+
+        // Parse response and log the list of dog breeds
+        const breedsList = document.getElementById('breeds-list');
+        for (const breed in data.message) {
+          const listItem = document.createElement('li');
+          listItem.textContent = breed;
+          breedsList.appendChild(listItem);
+
+          // Part 4: Interactive Breed Selection
+          listItem.addEventListener('click', () => {
+            fetchBreedDetails(breed);
+          });
+        }
+      })
+      .catch(error => {
+        console.error('There was a problem with the fetch operation:', error);
+      });
+
+    // Part 2: Handling Responses
+    // Error handling for network errors or if the API is down is included in the fetch requests above.
+
+    // Part 3: Displaying Detailed Breed Information
+    function fetchBreedDetails(breed) {
+      fetch(`https://dog.ceo/api/breed/${breed}/images/random`)
+        .then(response => {
+          if (!response.ok) {
+            throw new Error('Network response was not ok');
+          }
+          return response.json();
+        })
+        .then(data => {
+          console.log(data);
+
+          // Display breed details
+          const breedDetails = document.getElementById('breed-details');
+          breedDetails.innerHTML = `<h2>${breed}</h2>
+                                     <img src="${data.message}" alt="${breed}">
+                                     <p>Description: Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>`;
+        })
+        .catch(error => {
+          console.error('There was a problem with the fetch operation:', error);
+        });
+    }
+
+    // Part 5: Working with Dog Facts and Groups
+    // Fetch random dog facts
+    fetch('https://dog.ceo/api/breeds/image/random/3')
+      .then(response => response.json())
+      .then(data => {
+        const dogFactsList = document.getElementById('dog-facts');
+        data.message.forEach(fact => {
+          const listItem = document.createElement('li');
+          listItem.textContent = fact;
+          dogFactsList.appendChild(listItem);
+        });
+      })
+      .catch(error => console.error('Error fetching dog facts:', error));
+
+    // Fetch information about dog groups
+    fetch('https://dog.ceo/api/breeds/list/all')
+      .then(response => response.json())
+      .then(data => {
+        const dogGroupsList = document.getElementById('dog-groups');
+        const groups = Object.keys(data.message);
+        groups.forEach(group => {
+          const listItem = document.createElement('li');
+          listItem.textContent = group;
+          dogGroupsList.appendChild(listItem);
+        });
+      })
+      .catch(error => console.error('Error fetching dog groups:', error));
+  </script>
+</body>
+</html>
